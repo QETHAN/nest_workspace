@@ -11,12 +11,15 @@ import {
   HttpException,
   HttpStatus,
   UseFilters,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateCatDto } from './DTO/create-cat.dto';
 import { CatsService } from './cats.service';
 import { Cat } from './interfaces/cat.interface';
 import { ForbiddenException } from 'src/exceptions/forbidden.exception';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
+// import { ValidationPipe } from 'src/pipes/validation.pipe';
 
 @Controller('cats')
 export class CatsController {
@@ -33,11 +36,20 @@ export class CatsController {
     return `this action returns a #${params.id} cat`;
   }
 
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      validationError: {
+        target: false,
+      },
+    }),
+  )
   @Post()
   // @UseFilters(HttpExceptionFilter)
   async create(@Body() createCatDto: CreateCatDto) {
-    throw new ForbiddenException();
-    this.catsService.create(createCatDto);
+    // throw new ForbiddenException();
+    return this.catsService.create(createCatDto);
   }
 
   @Put(':id')
